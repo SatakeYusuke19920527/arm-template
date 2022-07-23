@@ -1,0 +1,102 @@
+{
+  "id": "/subscriptions/8818225c-58f0-44de-a997-92f946312b3b/resourceGroups/DTL/providers/Microsoft.Resources/deployments/main",
+  "location": null,
+  "name": "main",
+  "properties": {
+    "correlationId": "0b0b5eaf-0f5f-42cb-97f2-387374ced387",
+    "debugSetting": null,
+    "dependencies": [],
+    "duration": "PT8M1.074715S",
+    "error": null,
+    "mode": "Incremental",
+    "onErrorDeployment": null,
+    "outputResources": [
+      {
+        "id": "/subscriptions/8818225c-58f0-44de-a997-92f946312b3b/resourceGroups/DTL/providers/Microsoft.DevTestLab/labs/DTL-labo/virtualmachines/satake007",
+        "resourceGroup": "DTL"
+      },
+      {
+        "id": "/subscriptions/8818225c-58f0-44de-a997-92f946312b3b/resourceGroups/DTL/providers/Microsoft.Resources/deploymentScripts/runPowerShellInline",
+        "resourceGroup": "DTL"
+      }
+    ],
+    "outputs": {
+      "labVMId": {
+        "type": "String",
+        "value": "/subscriptions/8818225c-58f0-44de-a997-92f946312b3b/resourceGroups/DTL/providers/Microsoft.DevTestLab/labs/DTL-labo/virtualmachines/satake007"
+      }
+    },
+    "parameters": {
+      "labName": {
+        "type": "String",
+        "value": "DTL-labo"
+      },
+      "newVMName": {
+        "type": "String",
+        "value": "satake007"
+      },
+      "password": {
+        "type": "SecureString"
+      },
+      "size": {
+        "type": "String",
+        "value": "Standard_D2s_v3"
+      },
+      "userName": {
+        "type": "String",
+        "value": "satake"
+      }
+    },
+    "parametersLink": null,
+    "providers": [
+      {
+        "id": null,
+        "namespace": "Microsoft.DevTestLab",
+        "providerAuthorizationConsentState": null,
+        "registrationPolicy": null,
+        "registrationState": null,
+        "resourceTypes": [
+          {
+            "aliases": null,
+            "apiProfiles": null,
+            "apiVersions": null,
+            "capabilities": null,
+            "defaultApiVersion": null,
+            "locationMappings": null,
+            "locations": ["japaneast"],
+            "properties": null,
+            "resourceType": "labs/virtualmachines"
+          }
+        ]
+      },
+      {
+        "id": null,
+        "namespace": "Microsoft.Resources",
+        "providerAuthorizationConsentState": null,
+        "registrationPolicy": null,
+        "registrationState": null,
+        "resourceTypes": [
+          {
+            "aliases": null,
+            "apiProfiles": null,
+            "apiVersions": null,
+            "capabilities": null,
+            "defaultApiVersion": null,
+            "locationMappings": null,
+            "locations": ["japaneast"],
+            "properties": null,
+            "resourceType": "deploymentScripts"
+          }
+        ]
+      }
+    ],
+    "provisioningState": "Succeeded",
+    "templateHash": "2184321612982549537",
+    "templateLink": null,
+    "timestamp": "2022-07-23T07:56:30.015621+00:00",
+    "validatedResources": null
+  },
+  "resourceGroup": "DTL",
+  "tags": null,
+  "type": "Microsoft.Resources/deployments"
+}

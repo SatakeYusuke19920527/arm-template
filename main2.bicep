@@ -1,4 +1,4 @@
-param newVMName string = 'satake009'
+param newVMName string = 'satake001'
 param labName string = 'DTL-labo'
 param size string = 'Standard_D2s_v3'
 param userName string = 'satake'
@@ -23,27 +23,24 @@ resource vmName 'Microsoft.DevTestLab/labs/virtualmachines@2018-10-15-preview' =
     userName: userName
     password: password
     isAuthenticationWithSshKey: false
-    artifacts: [
-      {
-        artifactId: resourceId('Microsoft.DevTestLab/labs/artifactSources/artifacts', labName, 'public repo', 'windows-azurepowershell')
-      }
-    ]
     labSubnetName: labSubnetName
     disallowPublicIpAddress: false
     storageType: 'Premium'
     allowClaim: false
   }
-  resource installCustomScriptExtension 'extensions' = {
-    name: 'InstallCustomScript'
-    location: resourceGroup().location
-    properties: {
-      azPowerShellVersion: '6.4'
-      primaryScriptUri: 'https://adtllabo9035.blob.core.windows.net/test/test1.ps1'
-      supportingScriptUris: []
-      timeout: 'PT30M'
-      cleanupPreference: 'OnSuccess'
-      retentionInterval: 'P1D'
-    }
+}
+
+resource runPowerShellInline 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
+  name: 'runPowerShellInline'
+  location: resourceGroup().location
+  kind: 'AzurePowerShell'
+  properties: {
+    azPowerShellVersion: '6.4'
+    primaryScriptUri: 'https://adtllabo9035.blob.core.windows.net/test/test2.ps1'
+    supportingScriptUris: []
+    timeout: 'PT30M'
+    cleanupPreference: 'OnSuccess'
+    retentionInterval: 'P1D'
   }
 }
 

@@ -1,0 +1,12 @@
+{
+  'code': 'InvalidTemplateDeployment', 
+  'message': "The template deployment 'main' is not valid according to the validation procedure. The tracking id is 'de993674-6155-4dbf-999d-4cbb788c9699'. See inner errors for details."
+}
+
+
+Inner Errors: 
+{
+  'code': 'DeploymentPreflightValidationFailed', 
+  'target': '/subscriptions/8818225c-58f0-44de-a997-92f946312b3b/resourceGroups/DTL/providers/Microsoft.Resources/deploymentScripts/runPowerShellInline', 
+  'message': 'Either scriptContent or primaryScriptUri must be provided. Please refer to https://aka.ms/DeploymentScriptsTroubleshoot for more deployment script information.'
+}
