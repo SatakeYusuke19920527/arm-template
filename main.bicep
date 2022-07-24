@@ -1,50 +1,137 @@
-param newVMName string = 'satake009'
-param labName string = 'DTL-labo'
-param size string = 'Standard_D2s_v3'
-param userName string = 'satake'
+@description('Specifies the location for resources.')
+param location string = 'japaneast'
+param networkInterfaceName string = 'test-nic'
+param networkSecurityGroupName string = 'test-nsg'
+param networkSecurityGroupRules array
+param subnetName string
+param virtualNetworkId string
+param publicIpAddressName1 string
+param publicIpAddressType string
+param publicIpAddressSku string
+param pipDeleteOption string
+param virtualMachineName string
+param osDiskType string
+param osDiskDeleteOption string
+param virtualMachineSize string
+param nicDeleteOption string
+param adminUsername string
 
 @secure()
-param password string
+param adminPassword string
+param patchMode string
+param enableHotpatching bool
+param zone string
 
-var labSubnetName = 'DTL-subnet'
-var labVirtualNetworkId = resourceId('Microsoft.DevTestLab/labs/virtualnetworks', labName, labVirtualNetworkName)
-var labVirtualNetworkName = 'DTL-vnet'
-var vmId = resourceId('Microsoft.DevTestLab/labs/virtualmachines', labName, newVMName)
-var vmName_var = '${labName}/${newVMName}'
+var nsgId = resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', networkSecurityGroupName)
+var vnetId = virtualNetworkId
+var vnetName = last(split(vnetId, '/'))
+var subnetRef = '${vnetId}/subnets/${subnetName}'
 
-resource vmName 'Microsoft.DevTestLab/labs/virtualmachines@2018-10-15-preview' = {
-  name: vmName_var
-  location: resourceGroup().location
+resource networkInterfaceName_resource 'Microsoft.Network/networkInterfaces@2021-03-01' = {
+  name: networkInterfaceName
+  location: location
   properties: {
-    labVirtualNetworkId: labVirtualNetworkId
-    notes: 'WindowsServer2019-sysprep'
-    customImageId: '/subscriptions/8818225c-58f0-44de-a997-92f946312b3b/resourcegroups/dtl/providers/microsoft.devtestlab/labs/dtl-labo/customimages/windowsserver2019-sysprep'
-    size: size
-    userName: userName
-    password: password
-    isAuthenticationWithSshKey: false
-    artifacts: [
+    ipConfigurations: [
       {
-        artifactId: resourceId('Microsoft.DevTestLab/labs/artifactSources/artifacts', labName, 'public repo', 'windows-azurepowershell')
+        name: 'ipconfig1'
+        properties: {
+          subnet: {
+            id: subnetRef
+          }
+          privateIPAllocationMethod: 'Dynamic'
+          publicIPAddress: {
+            id: resourceId(resourceGroup().name, 'Microsoft.Network/publicIpAddresses', publicIpAddressName1)
+            properties: {
+              deleteOption: pipDeleteOption
+            }
+          }
+        }
       }
     ]
-    labSubnetName: labSubnetName
-    disallowPublicIpAddress: false
-    storageType: 'Premium'
-    allowClaim: false
-  }
-  resource installCustomScriptExtension 'extensions' = {
-    name: 'InstallCustomScript'
-    location: resourceGroup().location
-    properties: {
-      azPowerShellVersion: '6.4'
-      primaryScriptUri: 'https://adtllabo9035.blob.core.windows.net/test/test1.ps1'
-      supportingScriptUris: []
-      timeout: 'PT30M'
-      cleanupPreference: 'OnSuccess'
-      retentionInterval: 'P1D'
+    networkSecurityGroup: {
+      id: nsgId
     }
+  }
+  dependsOn: [
+    networkSecurityGroupName_resource
+    publicIpAddressName1_resource
+  ]
+}
+
+resource networkSecurityGroupName_resource 'Microsoft.Network/networkSecurityGroups@2019-02-01' = {
+  name: networkSecurityGroupName
+  location: location
+  properties: {
+    securityRules: networkSecurityGroupRules
   }
 }
 
-output labVMId string = vmId
+resource publicIpAddressName1_resource 'Microsoft.Network/publicIpAddresses@2020-08-01' = {
+  name: publicIpAddressName1
+  location: location
+  properties: {
+    publicIPAllocationMethod: publicIpAddressType
+  }
+  sku: {
+    name: publicIpAddressSku
+  }
+  zones: [
+    '1'
+  ]
+}
+
+resource virtualMachineName_resource 'Microsoft.Compute/virtualMachines@2022-03-01' = {
+  name: virtualMachineName
+  location: location
+  properties: {
+    hardwareProfile: {
+      vmSize: virtualMachineSize
+    }
+    storageProfile: {
+      osDisk: {
+        createOption: 'fromImage'
+        managedDisk: {
+          storageAccountType: osDiskType
+        }
+        deleteOption: osDiskDeleteOption
+      }
+      imageReference: {
+        id: '/subscriptions/8818225c-58f0-44de-a997-92f946312b3b/resourceGroups/test-rg/providers/Microsoft.Compute/images/satake-image-20220724092953'
+      }
+    }
+    networkProfile: {
+      networkInterfaces: [
+        {
+          id: networkInterfaceName_resource.id
+          properties: {
+            deleteOption: nicDeleteOption
+          }
+        }
+      ]
+    }
+    osProfile: {
+      computerName: virtualMachineName
+      adminUsername: adminUsername
+      adminPassword: adminPassword
+      windowsConfiguration: {
+        enableAutomaticUpdates: true
+        provisionVMAgent: true
+        patchSettings: {
+          enableHotpatching: enableHotpatching
+          patchMode: patchMode
+        }
+      }
+    }
+    licenseType: 'Windows_Server'
+    diagnosticsProfile: {
+      bootDiagnostics: {
+        enabled: true
+      }
+    }
+  }
+  zones: [
+    '1'
+  ]
+}
+
+output adminUsername string = adminUsername
